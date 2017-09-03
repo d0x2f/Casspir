@@ -12,8 +12,8 @@ AM_PROG_AR
 
 LT_INIT
 
-# Checks for c++17 support
-AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
+# Checks for c++14 support
+AX_CXX_COMPILE_STDCXX_14([noext], [mandatory])
 
 # Checks for libraries.
 
