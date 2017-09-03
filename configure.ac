@@ -12,19 +12,7 @@ AM_PROG_AR
 LT_INIT
 
 # Checks for c++17 support
-AX_CHECK_COMPILE_FLAG([-std=gnu++1z],
-    [# action-if-success
-    AX_APPEND_FLAG([-std=gnu++1z], [CXX])
-    ],
-    [# action-if-fail
-    AX_CHECK_COMPILE_FLAG([-std=c++1z],
-        [# action-if-success
-        AX_APPEND_FLAG([-std=c++1z], [CXX])
-        ],
-        [# action-if-fail
-        AC_MSG_ERROR([c++1z support required.])
-        ])
-])
+AX_CXX_COMPILE_STDCXX_17([noext], [mandatory])
 
 # Checks for libraries.
 
