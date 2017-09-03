@@ -6,7 +6,7 @@
  *
  * @param w Width
  * @param h Height
- * @param difficulty Dificulty factor 0-255
+ * @param difficulty Difficulty factor 0-255
  *
  * @return A w*x size vector of tiles.
  */
