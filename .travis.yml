@@ -33,3 +33,7 @@ matrix:
 before_install:
     - eval "${MATRIX_EVAL}"
     - pip install --user cpp-coveralls
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install -y autoconf automake
