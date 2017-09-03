@@ -4,7 +4,6 @@
 AC_PREREQ([2.69])
 AC_INIT([Casspir], [1.0], [me@dyl.dog])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
-AC_CONFIG_MACRO_DIRS([m4])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -13,7 +12,7 @@ AM_PROG_AR
 LT_INIT
 
 # Checks for c++14 support
-AX_CXX_COMPILE_STDCXX_14([noext], [mandatory])
+AX_CXX_COMPILE_STDCXX([14], [noext], [mandatory])
 
 # Checks for libraries.
 
