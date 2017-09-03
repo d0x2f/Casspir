@@ -1,16 +1,34 @@
 
 #include "casspir.hh"
+#include "Map.hh"
 
-/*
- * Generate an n*m minesweeper map.
+/**
+ * Generate a w*h minesweeper map.
  *
  * @param w Width
  * @param h Height
  * @param difficulty Difficulty factor 0-255
+ * @param click Coordinate of the players first move.
  *
- * @return A w*x size vector of tiles.
+ * @return A new minesweeper map
  */
-std::vector<Casspir::TileValues> generate_map(uint32_t w, uint32_t h, uint8_t difficulty)
+Casspir::Map casspir_generate_map(uint32_t w, uint32_t h, uint8_t difficulty, Casspir::Point click)
 {
-    return std::vector<Casspir::TileValues>(w*h);
+    return Casspir::Map(w, h, difficulty, click);
 }
+
+/**
+ * If the tile is unflipped, flip it and adjoining tiles recusively while tile value is non zero.
+ * If the tile is flipped, expand adjoining unflipped tiles.
+ *
+ * @param map The game map.
+ * @param position The posiiton to flip.
+ *
+ * @return The new map state after the flip.
+ */
+Casspir::Map casspir_evaluate_flip(Casspir::Map map, Casspir::Point position)
+{
+    map.flip(position);
+}
+
+std::vector<Casspir::Point> casspir_solve(Casspir::Map map);

@@ -1,5 +1,11 @@
 lib_LTLIBRARIES = libcasspir.la
 
-libcasspir_la_SOURCES = casspir.cc
+libcasspir_la_SOURCES = \
+    casspir.cc \
+    Map.cc
 
-include_HEADERS = casspir.hh
+pkginclude_HEADERS = \
+    casspir.hh \
+    Map.hh \
+    definitions.hh
+
