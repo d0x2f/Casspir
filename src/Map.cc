@@ -23,10 +23,6 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
 
     this->state.resize(width*height);
 
-    if (difficulty == 0) {
-        difficulty++;
-    }
-
     //Place mines
     float mine_probability = ((float)(difficulty+100)) / 512.f;
     for (auto& tile : this->state) {
