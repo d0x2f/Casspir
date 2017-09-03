@@ -1,6 +1,7 @@
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include <vector>
+#include <iostream>
 
 #include <casspir.hh>
 
@@ -19,6 +20,7 @@ static void test_generate_small_puzzle()
     for (const auto& tile : state) {
         mines += (tile.value == Casspir::TileValue::MINE);
     }
+
     assert( mines >= 5 );
 }
 

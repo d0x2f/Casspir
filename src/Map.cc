@@ -1,3 +1,5 @@
+#include <random>
+
 #include "Map.hh"
 
 using namespace Casspir;
@@ -15,6 +17,10 @@ using namespace Casspir;
 Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
     : width(width), height(height), difficulty(difficulty)
 {
+    std::random_device r_device;
+    std::default_random_engine r_engine(r_device());
+    std::uniform_real_distribution<> r_distribution(0, 1);
+
     this->state.resize(width*height);
 
     if (difficulty == 0) {
@@ -22,9 +28,11 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
     }
 
     //Place mines
-    float mine_probability = (float)difficulty / 512.f;
+    float mine_probability = ((float)(difficulty+100)) / 512.f;
     for (auto& tile : this->state) {
-        tile.value = TileValue::MINE;
+        if (r_distribution(r_engine) < mine_probability) {
+            tile.value = TileValue::MINE;
+        }
     }
 
     //Calculate remaining tile values
