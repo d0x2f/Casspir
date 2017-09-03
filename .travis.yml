@@ -1,0 +1,35 @@
+language: cpp
+
+sudo: enabled
+dist: trusty
+
+compiler:
+  - gcc
+
+before_script:
+  - autoreconf --force --install
+
+script:
+  - ./configure CXXFLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0" && make && sudo make check
+
+after_failure:
+  - cat test/test-suite.log
+
+after_success:
+  - travis_retry coveralls --exclude test --gcov-options '\-lp'
+
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env:
+        - MATRIX_EVAL="CC=gcc-6 && CXX=g++-6"
+
+before_install:
+    - eval "${MATRIX_EVAL}"
+    - pip install --user cpp-coveralls
