@@ -4,24 +4,20 @@
 
 namespace Casspir
 {
-    enum TileValue {
-        ZERO = 0,
-        ONE = 1,
-        TWO = 2,
-        THREE = 3,
-        FOUR = 4,
-        FIVE = 5,
-        SIX = 6,
-        SEVEN = 7,
-        EIGHT = 8,
-        MINE = 9
-    };
 
     struct TileState {
-        TileValue value;
+        uint8_t value;
+        bool mine;
+        bool flagged;
         bool flipped;
 
-        TileState(TileValue value = ZERO, bool flipped = false) : value(value), flipped(flipped) {}
+        TileState(
+            uint8_t value = 0,
+            bool mine = false,
+            bool flagged = false,
+            bool flipped = false
+        ) : value(value), mine(mine), flagged(flagged), flipped(flipped)
+        {}
     };
 
     struct Point {
@@ -29,9 +25,28 @@ namespace Casspir
 
         Point(uint32_t x, uint32_t y) : x(x), y(y) {};
 
-        uint64_t get_index()
+        uint64_t get_index(uint32_t width)
         {
-            return x*y;
+            return y*width + x;
         }
+
+        static Point from_index(uint64_t index, uint32_t width)
+        {
+            return Point(index % width, index / width);
+        }
+
+        bool operator==(const Point& other) {
+            return this->x == other.x && this->y == other.y;
+        }
+
+        bool operator!=(const Point& other) {
+            return !(*this == other);
+        }
+    };
+
+    enum MapStatus {
+        IN_PROGRESS,
+        FAILED,
+        COMPLETE
     };
 }

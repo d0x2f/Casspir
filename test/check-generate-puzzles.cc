@@ -1,7 +1,5 @@
 #include <cassert>
 #include <cstdlib>
-#include <vector>
-#include <iostream>
 
 #include <casspir.hh>
 
@@ -16,12 +14,7 @@ static void test_generate_small_puzzle()
     assert( state.size() == 100 );
 
     //The map should have at least 5 mines.
-    int mines = 0;
-    for (const auto& tile : state) {
-        mines += (tile.value == Casspir::TileValue::MINE);
-    }
-
-    assert( mines >= 5 );
+    assert( map.get_mines_remaining() >= 5 );
 }
 
 int main (void)

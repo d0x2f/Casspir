@@ -1,4 +1,5 @@
 #include <random>
+#include <iostream>
 
 #include "Map.hh"
 
@@ -10,11 +11,11 @@ using namespace Casspir;
  * @param width Width
  * @param height Height
  * @param difficulty Difficulty factor 0-255
- * @param click Coordinate of the players first move.
+ * @param first_flip Coordinate of the players first move.
  *
  * @return A width*height size vector of tiles.
  */
-Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
+Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
     : width(width), height(height), difficulty(difficulty)
 {
     std::random_device r_device;
@@ -24,15 +25,28 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
     this->state.resize(width*height);
 
     //Place mines
-    float mine_probability = ((float)(difficulty+100)) / 512.f;
-    for (auto& tile : this->state) {
-        if (r_distribution(r_engine) < mine_probability) {
-            tile.value = TileValue::MINE;
+    this->mines_remaining = 0;
+    float mine_probability = ((float)(difficulty+20)) / 512.f;
+    for (size_t i = 0; i < this->state.size(); i++) {
+        Point position = Point::from_index(i, this->width);
+
+        //Place if random value breaks difficulty threshold
+        //But not if this is the first flipped tile
+        if (r_distribution(r_engine) < mine_probability && position != first_flip) {
+            this->state[i].mine = true;
+            this->mines_remaining += 1;
+
+            //Increment neighbour values
+            for (auto neighbour : this->get_neighbours(position)) {
+                this->state[neighbour.get_index(this->width)].value ++;
+            }
         }
     }
 
-    //Calculate remaining tile values
-    //TODO
+    this->status = MapStatus::IN_PROGRESS;
+
+    //Flip the first tile
+    this->flip_recurse(first_flip);
 }
 
 /**
@@ -43,7 +57,7 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point click)
  */
 void Map::flip(Point position)
 {
-    TileState tile = this->state[position.get_index()];
+    TileState tile = this->state[position.get_index(this->width)];
 
     std::vector<Point> neighbours = this->get_neighbours(position);
 
@@ -66,25 +80,31 @@ void Map::flip(Point position)
  */
 void Map::flip_recurse(Point position)
 {
-    TileState tile = this->state[position.get_index()];
+    TileState tile = this->state[position.get_index(this->width)];
 
     //If the tile is already flipped, ignore it.
     if (tile.flipped) {
         return;
     }
 
-   //Flip the tile.
-    this->state[position.get_index()].flipped = true;
+    //Flip the tile.
+    this->state[position.get_index(this->width)].flipped = true;
+    this->tiles_flipped++;
+
+    //If the tile is a mine, fail the game
+    if (tile.mine) {
+        this->status = MapStatus::FAILED;
+    }
 
     //If the tile value is non-zero we're done.
-    if (tile.value == TileValue::ZERO && !tile.flipped) {
+    if (tile.value != 0) {
         return;
     }
 
     //Recurse into the neighbours.
     std::vector<Point> neighbours = this->get_neighbours(position);
 
-    for (const auto& neighbour : neighbours) {
+    for (const auto neighbour : neighbours) {
         this->flip_recurse(neighbour);
     }
 }
@@ -117,6 +137,60 @@ uint32_t Map::get_height()
 std::vector<TileState> Map::get_state()
 {
     return this->state;
+}
+
+/**
+ * Get the number of flipped tiles.
+ *
+ * @return number of flipped tiles
+ */
+uint64_t Map::get_num_flipped()
+{
+    return this->tiles_flipped;
+}
+
+/**
+ * Get the number of mines left.
+ *
+ * @return mines remaining
+ */
+uint64_t Map::get_mines_remaining()
+{
+    return this->mines_remaining;
+}
+
+/**
+ * Get the current map status.
+ *
+ * @return The map status
+ */
+MapStatus Map::get_status()
+{
+    return this->status;
+}
+
+/**
+ * Print the board to stdout
+ */
+void Map::print()
+{
+    for (size_t i = 0; i < this->state.size(); i++) {
+        if ((i % this->width) == 0) {
+            std::cout << std::endl;
+        }
+        char token;
+        TileState tile = this->state[i];
+        if (tile.flipped) {
+            if (tile.mine) {
+                token = '*';
+            } else {
+                token = '0' + tile.value;
+            }
+        } else {
+            token = '#';
+        }
+        std::cout << token;
+    }
 }
 
 /**
