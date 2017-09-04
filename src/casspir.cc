@@ -31,19 +31,6 @@ Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::vector<Casspir::Point
 }
 
 /**
- * Evaluate a tile flip
- *
- * @param map The game map.
- * @param position The posiiton to flip.
- *
- * @return The new map state after the flip.
- */
-Casspir::Map casspir_evaluate_flip(Casspir::Map map, Casspir::Point position)
-{
-    map.flip(position);
-}
-
-/**
  * Solve the given map.
  *
  * @param map The game map to solve.
@@ -52,5 +39,5 @@ Casspir::Map casspir_evaluate_flip(Casspir::Map map, Casspir::Point position)
  */
 std::vector<Casspir::Point> casspir_solve(Casspir::Map map)
 {
-
+    //TODO
 }
