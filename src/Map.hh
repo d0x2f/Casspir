@@ -11,6 +11,7 @@ namespace Casspir
     {
         public:
             Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip);
+            Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines);
 
             void flip(Point position);
 
@@ -25,8 +26,9 @@ namespace Casspir
             void print();
 
         private:
+            Map(uint32_t width, uint32_t height);
+
             uint32_t width, height;
-            uint8_t difficulty;
             uint64_t mines_remaining, tiles_flipped;
             MapStatus status;
             std::vector<TileState> state;

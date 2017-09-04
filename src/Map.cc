@@ -6,25 +6,21 @@
 using namespace Casspir;
 
 /**
- * Initialise a width*height minesweeper map.
+ * Initialise a width*height minesweeper map with randomly placed mines.
  *
  * @param width Width
  * @param height Height
  * @param difficulty Difficulty factor 0-255
  * @param first_flip Coordinate of the players first move.
- *
- * @return A width*height size vector of tiles.
  */
 Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
-    : width(width), height(height), difficulty(difficulty)
-{
+ : Map(width, height)
+ {
     std::random_device r_device;
     std::default_random_engine r_engine(r_device());
     std::uniform_real_distribution<> r_distribution(0, 1);
 
-    this->state.resize(width*height);
-
-    //Place mines
+    //Place mines randomly
     this->mines_remaining = 0;
     float mine_probability = ((float)(difficulty+20)) / 512.f;
     for (size_t i = 0; i < this->state.size(); i++) {
@@ -43,10 +39,45 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
         }
     }
 
-    this->status = MapStatus::IN_PROGRESS;
-
     //Flip the first tile
     this->flip_recurse(first_flip);
+}
+
+/**
+ * Initialise a width*height minesweeper map with mines in the given positions.
+ *
+ * @param width Width
+ * @param height Height
+ * @param mines A list of mine positions.
+ */
+Map::Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines)
+: Map(width, height)
+{
+    for(auto& mine : mines) {
+        this->state[mine.get_index(width)].mine = true;
+        this->mines_remaining += 1;
+
+        //Increment neighbour values
+        for (auto neighbour : this->get_neighbours(mine)) {
+            this->state[neighbour.get_index(this->width)].value ++;
+        }
+    }
+
+    this->mines_remaining = mines.size();
+}
+
+/**
+ * Initialise a width*height minesweeper map.
+ *
+ * @param width Width
+ * @param height Height
+ */
+Map::Map(uint32_t width, uint32_t height)
+    : width(width), height(height)
+{
+    this->state.resize(width*height);
+    this->status = MapStatus::IN_PROGRESS;
+    this->tiles_flipped = 0;
 }
 
 /**
@@ -94,6 +125,7 @@ void Map::flip_recurse(Point position)
     //If the tile is a mine, fail the game
     if (tile.mine) {
         this->status = MapStatus::FAILED;
+        return;
     }
 
     //If the tile value is non-zero we're done.
