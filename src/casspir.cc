@@ -31,8 +31,7 @@ Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::vector<Casspir::Point
 }
 
 /**
- * If the tile is unflipped, flip it and adjoining tiles recusively while tile value is non zero.
- * If the tile is flipped, expand adjoining unflipped tiles.
+ * Evaluate a tile flip
  *
  * @param map The game map.
  * @param position The posiiton to flip.
@@ -44,6 +43,13 @@ Casspir::Map casspir_evaluate_flip(Casspir::Map map, Casspir::Point position)
     map.flip(position);
 }
 
+/**
+ * Solve the given map.
+ *
+ * @param map The game map to solve.
+ *
+ * @return A list of tile positions in the order the solver has flipped.
+ */
 std::vector<Casspir::Point> casspir_solve(Casspir::Map map)
 {
 
