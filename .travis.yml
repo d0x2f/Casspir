@@ -1,6 +1,6 @@
 language: cpp
 
-sudo: enabled
+sudo: false
 dist: trusty
 
 compiler:
@@ -10,7 +10,7 @@ before_script:
   - autoreconf --force --install
 
 script:
-  - ./configure CXXFLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0" && make && sudo make check
+  - ./configure CXXFLAGS="-fprofile-arcs -ftest-coverage -fPIC -O0" && make && make check
 
 after_failure:
   - cat test/test-suite.log
