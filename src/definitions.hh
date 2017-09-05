@@ -25,7 +25,7 @@ namespace Casspir
 
         Point(uint32_t x, uint32_t y) : x(x), y(y) {};
 
-        uint64_t get_index(uint32_t width)
+        uint64_t get_index(uint32_t width) const
         {
             return y*width + x;
         }
@@ -35,11 +35,11 @@ namespace Casspir
             return Point(index % width, index / width);
         }
 
-        bool operator==(const Point& other) {
+        bool operator==(const Point& other) const {
             return this->x == other.x && this->y == other.y;
         }
 
-        bool operator!=(const Point& other) {
+        bool operator!=(const Point& other) const {
             return !(*this == other);
         }
     };

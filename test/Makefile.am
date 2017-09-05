@@ -6,6 +6,7 @@ check_PROGRAMS = \
     check-generate-puzzles \
     check-first-flip \
     check-map-print \
-    check-mine-flip
+    check-mine-flip \
+    check-convenience-flipper
 
 TESTS = $(check_PROGRAMS)

@@ -33,7 +33,7 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
             this->mines_remaining += 1;
 
             //Increment neighbour values
-            for (auto neighbour : this->get_neighbours(position)) {
+            for (const auto& neighbour : this->get_neighbours(position)) {
                 this->state[neighbour.get_index(this->width)].value ++;
             }
         }
@@ -58,7 +58,7 @@ Map::Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines)
         this->mines_remaining += 1;
 
         //Increment neighbour values
-        for (auto neighbour : this->get_neighbours(mine)) {
+        for (const auto& neighbour : this->get_neighbours(mine)) {
             this->state[neighbour.get_index(this->width)].value ++;
         }
     }
@@ -84,22 +84,45 @@ Map::Map(uint32_t width, uint32_t height)
  * If the tile is unflipped, flip it and adjoining tiles recusively while tile value is non zero.
  * If the tile is flipped, expand adjoining unflipped tiles.
  *
- * @param width Width
+ * @param position
  */
 void Map::flip(Point position)
 {
     TileState tile = this->state[position.get_index(this->width)];
-
     std::vector<Point> neighbours = this->get_neighbours(position);
 
     if (tile.flipped) {
-        //Already flipped, so flip the neighbours
+        //Already flipped,
+        //check if it's number is satisfied by flags and flip the neighbours.
+        uint8_t flags = 0;
         for (const auto& neighbour : neighbours) {
-            this->flip(neighbour);
+            flags += this->state[neighbour.get_index(this->width)].flagged;
         }
-    } else {
-        //Not yet flipped, let the flippening begin.
+        if (flags >= tile.value) {
+            for (const auto& neighbour : neighbours) {
+                TileState neighbour_tile = this->state[neighbour.get_index(this->width)];
+                if (!(neighbour_tile.flipped || tile.flagged)) {
+                    this->flip_recurse(neighbour);
+                }
+            }
+        }
+    } else if (!tile.flagged) {
+        //Not yet flipped or flagged, let the flippening begin.
         this->flip_recurse(position);
+    }
+}
+
+/**
+ * Flag the given position as a mine
+ * This position won't be flipped automatically.
+ *
+ * @param position
+ */
+void Map::flag(Point position)
+{
+    uint64_t index = position.get_index(this->width);
+    if (!this->state[index].flipped) {
+        this->state[index].flagged ^= true;
     }
 }
 
@@ -113,8 +136,8 @@ void Map::flip_recurse(Point position)
 {
     TileState tile = this->state[position.get_index(this->width)];
 
-    //If the tile is already flipped, ignore it.
-    if (tile.flipped) {
+    //If the tile is already flipped or flagged, ignore it.
+    if (tile.flipped || tile.flagged) {
         return;
     }
 
@@ -218,11 +241,14 @@ void Map::print()
             } else {
                 token = '0' + tile.value;
             }
+        } else if (tile.flagged) {
+            token = '^';
         } else {
             token = '#';
         }
         std::cout << token;
     }
+    std::cout << std::endl;
 }
 
 /**

@@ -14,6 +14,7 @@ namespace Casspir
             Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines);
 
             void flip(Point position);
+            void flag(Point position);
 
             uint32_t get_width();
             uint32_t get_height();
