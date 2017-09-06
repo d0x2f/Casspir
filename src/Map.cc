@@ -100,10 +100,7 @@ void Map::flip(Point position)
         }
         if (flags >= tile.value) {
             for (const auto& neighbour : neighbours) {
-                TileState neighbour_tile = this->state[neighbour.get_index(this->width)];
-                if (!(neighbour_tile.flipped || tile.flagged)) {
-                    this->flip_recurse(neighbour);
-                }
+                this->flip_recurse(neighbour);
             }
         }
     } else if (!tile.flagged) {
