@@ -29,12 +29,13 @@ static void test_map_print()
     map.flip(Casspir::Point(5,5));
     map.flip(Casspir::Point(5,1));
     map.flag(Casspir::Point(7,3));
+    map.flip(Casspir::Point(7,2));
 
     //The number of tiles flipped should be 72.
-    assert( map.get_num_flipped() == 72 );
+    assert( map.get_num_flipped() == 73 );
 
     //The game should be in progress
-    assert( map.get_status() == Casspir::MapStatus::IN_PROGRESS );
+    assert( map.get_status() == Casspir::MapStatus::FAILED );
 
 
     //Redirect cout to string stream
@@ -48,7 +49,7 @@ static void test_map_print()
     std::cout.rdbuf(coutbuf);
 
     std::string map_string =
-        "\n##10000000\n##32101110\n####212#21\n#######^##\n#2211111##\n#1000001##\n11000001##\n0000000111\n0000000000\n0^00000000\n";
+        "\n##10000000\n##32101110\n####212*21\n#######^##\n#2211111##\n#1000001##\n11000001##\n0000000111\n0000000000\n0^00000000\n";
 
     assert(cout_capture.str() == map_string);
 }

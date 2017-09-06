@@ -10,6 +10,10 @@ static void test_generate_small_puzzle()
     //Get the map state
     std::vector<Casspir::TileState> state = map.get_state();
 
+    //Check dimensions
+    assert( map.get_width() == 10 );
+    assert( map.get_height() == 10 );
+
     //The map should have 100 tiles.
     assert( state.size() == 100 );
 
