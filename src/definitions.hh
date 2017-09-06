@@ -44,6 +44,22 @@ namespace Casspir
         }
     };
 
+    enum OperationType {
+        FLIP,
+        FLAG
+    };
+
+    struct Operation {
+        OperationType type;
+        Point position;
+
+        Operation(
+            OperationType type,
+            Point position
+        ) : type(type), position(position)
+        {}
+    };
+
     enum MapStatus {
         IN_PROGRESS,
         FAILED,

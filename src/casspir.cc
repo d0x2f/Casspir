@@ -1,5 +1,4 @@
 #include "casspir.hh"
-#include "Map.hh"
 
 /**
  * Generate a w*h minesweeper map.
@@ -35,9 +34,9 @@ Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::vector<Casspir::Point
  *
  * @param map The game map to solve.
  *
- * @return A list of tile positions in the order the solver has flipped.
+ * @return A list of tile operations in sequence.
  */
-std::vector<Casspir::Point> casspir_solve(Casspir::Map map)
+std::vector<Casspir::Operation> casspir_solve(Casspir::Map map)
 {
     //TODO
 }

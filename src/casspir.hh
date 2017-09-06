@@ -19,4 +19,4 @@ Casspir::Map casspir_make_map(
     std::vector<Casspir::Point> mines
 );
 
-std::vector<Casspir::Point> casspir_solve(Casspir::Map map);
+std::vector<Casspir::Operation> casspir_solve(Casspir::Map map);
