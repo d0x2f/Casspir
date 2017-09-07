@@ -19,10 +19,10 @@ namespace Casspir
             uint32_t get_width();
             uint32_t get_height();
             std::vector<TileState> get_state();
-
             uint64_t get_num_flipped();
             uint64_t get_mines_remaining();
             MapStatus get_status();
+            TileState& get_tile(Point position);
 
             void print();
 

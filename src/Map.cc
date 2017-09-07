@@ -1,5 +1,6 @@
 #include <random>
 #include <iostream>
+#include <cassert>
 
 #include "Map.hh"
 
@@ -34,7 +35,7 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
 
             //Increment neighbour values
             for (const auto& neighbour : this->get_neighbours(position)) {
-                this->state[neighbour.get_index(this->width)].value ++;
+                this->get_tile(neighbour).value ++;
             }
         }
     }
@@ -54,12 +55,12 @@ Map::Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines)
 : Map(width, height)
 {
     for(auto& mine : mines) {
-        this->state[mine.get_index(width)].mine = true;
+        this->get_tile(mine).mine = true;
         this->mines_remaining += 1;
 
         //Increment neighbour values
         for (const auto& neighbour : this->get_neighbours(mine)) {
-            this->state[neighbour.get_index(this->width)].value ++;
+            this->get_tile(neighbour).value ++;
         }
     }
 
@@ -88,7 +89,7 @@ Map::Map(uint32_t width, uint32_t height)
  */
 void Map::flip(Point position)
 {
-    TileState tile = this->state[position.get_index(this->width)];
+    TileState& tile = this->get_tile(position);
     std::vector<Point> neighbours = this->get_neighbours(position);
 
     if (tile.flipped) {
@@ -96,7 +97,7 @@ void Map::flip(Point position)
         //check if it's number is satisfied by flags and flip the neighbours.
         uint8_t flags = 0;
         for (const auto& neighbour : neighbours) {
-            flags += this->state[neighbour.get_index(this->width)].flagged;
+            flags += this->get_tile(neighbour).flagged;
         }
         if (flags >= tile.value) {
             for (const auto& neighbour : neighbours) {
@@ -117,9 +118,9 @@ void Map::flip(Point position)
  */
 void Map::flag(Point position)
 {
-    uint64_t index = position.get_index(this->width);
-    if (!this->state[index].flipped) {
-        this->state[index].flagged ^= true;
+    TileState& tile = this->get_tile(position);
+    if (!tile.flipped) {
+        tile.flagged ^= true;
     }
 }
 
@@ -131,7 +132,7 @@ void Map::flag(Point position)
  */
 void Map::flip_recurse(Point position)
 {
-    TileState tile = this->state[position.get_index(this->width)];
+    TileState& tile = this->get_tile(position);
 
     //If the tile is already flipped or flagged, ignore it.
     if (tile.flipped || tile.flagged) {
@@ -139,7 +140,7 @@ void Map::flip_recurse(Point position)
     }
 
     //Flip the tile.
-    this->state[position.get_index(this->width)].flipped = true;
+    tile.flipped = true;
     this->tiles_flipped++;
 
     //If the tile is a mine, fail the game
@@ -219,6 +220,18 @@ uint64_t Map::get_mines_remaining()
 MapStatus Map::get_status()
 {
     return this->status;
+}
+
+/**
+ * Get the tile in the given position.
+ *
+ * @return A tile
+ */
+TileState& Map::get_tile(Point position)
+{
+    uint64_t index = position.get_index(this->width);
+    assert (index < this->state.size());
+    return this->state.at(index);
 }
 
 /**
