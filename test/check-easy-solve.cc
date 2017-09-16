@@ -28,7 +28,7 @@ static void test_easy_solve()
 
     Casspir::Solver solver(map);
     solver.solve();
-    map.print();
+
     assert( map.get_status() == Casspir::MapStatus::COMPLETE );
 }
 

@@ -13,7 +13,6 @@ std::queue<Operation> Solver::solve()
     size_t last_operation_count = 0;
     while (true) {
         this->perform_pass();
-        this->map.print();
 
         //Quit if the solver couldn't solve any more tiles.
         if (this->operations.size() == last_operation_count) {
