@@ -12,8 +12,11 @@ namespace Casspir
         bool flipped;
 
         TileState(
+            //Static
             uint8_t value = 0,
             bool mine = false,
+
+            //Dynamic
             bool flagged = false,
             bool flipped = false
         ) : value(value), mine(mine), flagged(flagged), flipped(flipped)

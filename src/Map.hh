@@ -13,16 +13,22 @@ namespace Casspir
             Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip);
             Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines);
 
-            void flip(Point position);
+            uint64_t flip(Point position);
             void flag(Point position);
+            void reset();
 
             uint32_t get_width();
             uint32_t get_height();
-            std::vector<TileState> get_state();
+            std::vector<TileState>& get_state();
             uint64_t get_num_flipped();
             uint64_t get_mines_remaining();
+            uint64_t get_total_mines();
             MapStatus get_status();
+
             TileState& get_tile(Point position);
+            TileState& get_tile(uint64_t index);
+
+            std::vector<Point> get_neighbours(Point position);
 
             void print();
 
@@ -30,11 +36,11 @@ namespace Casspir
             Map(uint32_t width, uint32_t height);
 
             uint32_t width, height;
-            uint64_t mines_remaining, tiles_flipped;
+            uint64_t total_mines, mines_remaining, tiles_flipped;
             MapStatus status;
             std::vector<TileState> state;
 
-            std::vector<Point> get_neighbours(Point position);
-            void flip_recurse(Point position);
+            uint64_t flip_recurse(Point position);
+            void check_completed();
     };
 }

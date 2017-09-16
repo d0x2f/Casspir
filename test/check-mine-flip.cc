@@ -23,8 +23,11 @@ static void test_mine_flip()
     //The number of tiles flipped should be 0.
     assert( map.get_num_flipped() == 0 );
 
-    map.flip(Casspir::Point(0,2));
-    map.flip(Casspir::Point(9,9));
+    //Should have flipped 25 tiles
+    assert( map.flip(Casspir::Point(0,2)) == 25 );
+
+    //Should have flipped 43 tiles
+    assert( map.flip(Casspir::Point(9,9)) == 43 );
 
     //The number of tiles flipped should be 68.
     assert( map.get_num_flipped() == 68 );
