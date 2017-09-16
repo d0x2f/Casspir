@@ -165,6 +165,8 @@ void Map::reset()
         tile.flipped = false;
         tile.flagged = false;
     }
+    this->mines_remaining = this->total_mines;
+    this->tiles_flipped = 0;
     this->status = MapStatus::IN_PROGRESS;
 }
 

@@ -10,15 +10,8 @@ Solver::Solver(Map& map) : map(map)
 
 std::queue<Operation> Solver::solve()
 {
-    size_t last_operation_count = 0;
-    while (true) {
-        this->perform_pass();
-
-        //Quit if the solver couldn't solve any more tiles.
-        if (this->operations.size() == last_operation_count) {
-            break;
-        }
-        last_operation_count = this->operations.size();
+    while (this->perform_pass()) {
+        // :D
     }
 
     return this->operations;
@@ -26,26 +19,34 @@ std::queue<Operation> Solver::solve()
 
 /**
  * Loop over each tile and evaluate each once.
+ *
+ * @return true if an action was performed.
  */
-void Solver::perform_pass()
+bool Solver::perform_pass()
 {
+    bool did_something = false;
     uint64_t size = this->map.get_width() * this->map.get_height();
 
     for (uint64_t i=0; i < size; i++) {
         TileState tile = this->map.get_tile(i);
         if (tile.flipped && tile.value > 0) {
-            this->evaluate_neighbours(i);
+            did_something |= this->evaluate_neighbours(i);
         }
     }
+
+    return did_something;
 }
 
 /**
  * Evalue the neighbours of the given tile and see if anything can be deduced.
  *
  * @param index The tile index to consider.
+ *
+ * @return true if an action was performed.
  */
-void Solver::evaluate_neighbours(uint64_t index)
+bool Solver::evaluate_neighbours(uint64_t index)
 {
+    bool did_something = false;
     TileState tile = this->map.get_tile(index);
     Point tile_position = Point::from_index(index, this->map.get_width());
 
@@ -62,28 +63,33 @@ void Solver::evaluate_neighbours(uint64_t index)
 
     if (flagged == tile.value && unflipped > 0) {
         //If this tile's values is satisfied by flagged neighbours, flip the rest
-        this->flip(tile_position);
+        did_something |= this->flip(tile_position);
     } else if (unflipped == tile.value) {
         //Otherwise if the number of unflipped match the tiles value, then flag the unflipped.
         for (const auto& neighbour : neighbours) {
             TileState neighbour_tile = this->map.get_tile(neighbour);
             if (!neighbour_tile.flagged && !neighbour_tile.flipped) {
-                this->flag(neighbour);
+                did_something |= this->flag(neighbour);
             }
         }
     }
+
+    return did_something;
 }
 
 /**
  * Flip the given position and record the operation in the solution.
  *
  * @param position the position to flip.
+ *
+ * @return true if an action was performed.
  */
-void Solver::flip(Point position)
+bool Solver::flip(Point position)
 {
     //Add the operation to the solution only if anything was actually flipped.
     if (this->map.flip(position) > 0) {
         this->operations.push(Operation(OperationType::FLIP, position));
+        return true;
     }
 }
 
@@ -91,9 +97,12 @@ void Solver::flip(Point position)
  * Flag the given position and record the operation in the solution.
  *
  * @param position the position to flag.
+ *
+ * @return true if an action was performed.
  */
-void Solver::flag(Point position)
+bool Solver::flag(Point position)
 {
     this->map.flag(position);
     this->operations.push(Operation(OperationType::FLAG, position));
+    return true;
 }

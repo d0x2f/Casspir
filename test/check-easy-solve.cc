@@ -29,7 +29,25 @@ static void test_easy_solve()
     Casspir::Solver solver(map);
     solver.solve();
 
+    //Map should be completed
     assert( map.get_status() == Casspir::MapStatus::COMPLETE );
+
+    //90 tiles should be flipped
+    assert( map.get_num_flipped() == 90 );
+
+    //0 mines should remain
+    assert( map.get_mines_remaining() == 0 );
+
+    map.reset();
+
+    //Map should be in progress
+    assert( map.get_status() == Casspir::MapStatus::IN_PROGRESS );
+
+    //0 tiles should be flipped
+    assert( map.get_num_flipped() == 0 );
+
+    //10 mines should remain
+    assert( map.get_mines_remaining() == 10 );
 }
 
 int main (void)

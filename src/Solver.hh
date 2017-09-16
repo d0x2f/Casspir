@@ -18,9 +18,9 @@ namespace Casspir
             Map& map;
             std::queue<Operation> operations;
 
-            void perform_pass();
-            void evaluate_neighbours(uint64_t index);
-            void flip(Point position);
-            void flag(Point position);
+            bool perform_pass();
+            bool evaluate_neighbours(uint64_t index);
+            bool flip(Point position);
+            bool flag(Point position);
     };
 }
