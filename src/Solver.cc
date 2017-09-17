@@ -91,6 +91,7 @@ bool Solver::flip(Point position)
         this->operations.push(Operation(OperationType::FLIP, position));
         return true;
     }
+    return false;
 }
 
 /**
