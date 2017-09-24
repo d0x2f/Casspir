@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <queue>
 #include <cstdint>
 
 #include "definitions.hh"
@@ -19,4 +20,6 @@ Casspir::Map casspir_make_map(
     std::vector<Casspir::Point> mines
 );
 
-std::vector<Casspir::Operation> casspir_solve(Casspir::Map map);
+std::queue<Casspir::Operation> casspir_solve(Casspir::Map& map);
+
+extern "C" int casspir_c_stub();

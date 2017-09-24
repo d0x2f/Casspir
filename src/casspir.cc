@@ -1,4 +1,5 @@
 #include "casspir.hh"
+#include "Solver.hh"
 
 /**
  * Generate a w*h minesweeper map.
@@ -36,7 +37,13 @@ Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::vector<Casspir::Point
  *
  * @return A list of tile operations in sequence.
  */
-std::vector<Casspir::Operation> casspir_solve(Casspir::Map map)
+std::queue<Casspir::Operation> casspir_solve(Casspir::Map& map)
 {
-    //TODO
+    Casspir::Solver solver(map);
+    return solver.solve();
 }
+
+/**
+ * I found this stub neccessary to satisfy an AC_CHECK_LIB macro in autotools.
+ */
+extern "C" int casspir_c_stub() {}

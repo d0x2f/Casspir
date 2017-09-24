@@ -26,8 +26,7 @@ static void test_easy_solve()
 
     map.flip(Casspir::Point(6,9));
 
-    Casspir::Solver solver(map);
-    solver.solve();
+    casspir_solve(map);
 
     //Map should be completed
     assert( map.get_status() == Casspir::MapStatus::COMPLETE );
