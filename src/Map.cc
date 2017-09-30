@@ -123,6 +123,10 @@ uint64_t Map::flip(Point position)
  */
 void Map::flag(Point position)
 {
+    if (this->get_status() != MapStatus::IN_PROGRESS) {
+        return;
+    }
+
     TileState& tile = this->get_tile(position);
     if (!tile.flipped) {
         if (tile.flagged) {
@@ -180,6 +184,10 @@ void Map::reset()
  */
 uint64_t Map::flip_recurse(Point position)
 {
+    if (this->get_status() != MapStatus::IN_PROGRESS) {
+        return 0;
+    }
+
     TileState& tile = this->get_tile(position);
 
     //If the tile is already flipped or flagged, ignore it.
@@ -318,7 +326,7 @@ bool Map::is_tile_satisfied(Point position)
 /**
  * Print the board to stdout
  */
-void Map::print()
+void Map::print(bool revealed)
 {
     for (size_t i = 0; i < this->state.size(); i++) {
         if ((i % this->width) == 0) {
@@ -326,7 +334,7 @@ void Map::print()
         }
         char token;
         TileState tile = this->state[i];
-        if (tile.flipped) {
+        if (tile.flipped || revealed) {
             if (tile.mine) {
                 token = '*';
             } else {

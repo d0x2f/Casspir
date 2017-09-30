@@ -65,6 +65,10 @@ bool Solver::perform_pass()
         TileState tile = this->map.get_tile(i);
         if (tile.flipped && tile.value > 0) {
             did_something |= this->evaluate_neighbours(i);
+
+            if (this->map.get_status() != MapStatus::IN_PROGRESS) {
+                break;
+            }
         }
     }
 
@@ -291,17 +295,12 @@ void Solver::recursive_border_search(
 
     if (is_border_tile) {
         //Recurse into the border tiles neighbours to find the rest of the border
-        for (const auto& neighbour : neighbours) {
+        for (const auto& neighbour : flipped_neighbours) {
 
-            //Dont recurse into neighbours that don't share a flipped neighbour in common
+            //Recurse into the unflipped neighbours of the flipped ones
             std::set<Point> candidate_neighbours = this->map.get_neighbours(neighbour);
             for (const auto& candidate_neighbour : candidate_neighbours) {
-                TileState candidate_neighbour_tile = this->map.get_tile(candidate_neighbour);
-
-                if (candidate_neighbour_tile.flipped && flipped_neighbours.count(candidate_neighbour) > 0) {
-                    this->recursive_border_search(neighbour, border_unflipped, border_flipped);
-                    break;
-                }
+                this->recursive_border_search(candidate_neighbour, border_unflipped, border_flipped);
             }
 
         }

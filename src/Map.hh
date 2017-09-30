@@ -33,7 +33,7 @@ namespace Casspir
 
             std::set<Point> get_neighbours(Point position);
 
-            void print();
+            void print(bool revealed = false);
 
         private:
             Map(uint32_t width, uint32_t height);
