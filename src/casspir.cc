@@ -25,7 +25,7 @@ Casspir::Map casspir_generate_map(uint32_t w, uint32_t h, uint8_t difficulty, Ca
  *
  * @return A new minesweeper map
  */
-Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::vector<Casspir::Point> mines)
+Casspir::Map casspir_make_map(uint32_t w, uint32_t h, std::set<Casspir::Point> mines)
 {
     return Casspir::Map(w, h, mines);
 }

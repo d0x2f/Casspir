@@ -26,7 +26,7 @@ namespace Casspir
     struct Point {
         uint32_t x, y;
 
-        Point(uint32_t x, uint32_t y) : x(x), y(y) {};
+        Point(uint32_t x=0, uint32_t y=0) : x(x), y(y) {};
 
         uint64_t get_index(uint32_t width) const
         {
@@ -44,6 +44,16 @@ namespace Casspir
 
         bool operator!=(const Point& other) const {
             return !(*this == other);
+        }
+
+        bool operator<(const Point& other) const {
+            if (this->y < other.y) {
+                return true;
+            } else if (this->y == other.y) {
+                return this->x < other.x;
+            } else {
+                return false;
+            }
         }
     };
 

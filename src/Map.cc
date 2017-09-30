@@ -53,7 +53,7 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
  * @param height Height
  * @param mines A list of mine positions.
  */
-Map::Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines)
+Map::Map(uint32_t width, uint32_t height, std::set<Point> mines)
 : Map(width, height)
 {
     for(auto& mine : mines) {
@@ -94,17 +94,13 @@ Map::Map(uint32_t width, uint32_t height)
 uint64_t Map::flip(Point position)
 {
     TileState& tile = this->get_tile(position);
-    std::vector<Point> neighbours = this->get_neighbours(position);
+    std::set<Point> neighbours = this->get_neighbours(position);
     uint64_t flipped = 0;
 
     if (tile.flipped) {
         //Already flipped,
         //check if it's number is satisfied by flags and flip the neighbours.
-        uint8_t flags = 0;
-        for (const auto& neighbour : neighbours) {
-            flags += this->get_tile(neighbour).flagged;
-        }
-        if (flags >= tile.value) {
+        if (this->is_tile_satisfied(position)) {
             for (const auto& neighbour : neighbours) {
                 flipped += this->flip_recurse(neighbour);
             }
@@ -203,7 +199,7 @@ uint64_t Map::flip_recurse(Point position)
     }
 
     //Recurse into the neighbours.
-    std::vector<Point> neighbours = this->get_neighbours(position);
+    std::set<Point> neighbours = this->get_neighbours(position);
 
     uint64_t flipped = 1;
     for (const auto neighbour : neighbours) {
@@ -304,6 +300,17 @@ TileState& Map::get_tile(uint64_t index)
     return this->state.at(index);
 }
 
+bool Map::is_tile_satisfied(Point position)
+{
+    TileState& tile = this->get_tile(position);
+    std::set<Point> neighbours = this->get_neighbours(position);
+    uint8_t flags = 0;
+    for (const auto& neighbour : neighbours) {
+        flags += this->get_tile(neighbour).flagged;
+    }
+    return (flags == tile.value);
+}
+
 /**
  * Print the board to stdout
  */
@@ -336,9 +343,9 @@ void Map::print()
  *
  * @param position The position to find neighbours for.
  */
-std::vector<Point> Map::get_neighbours(Point position)
+std::set<Point> Map::get_neighbours(Point position)
 {
-    std::vector<Point> neighbours;
+    std::set<Point> neighbours;
 
     bool \
         U = position.y > 0,
@@ -347,35 +354,35 @@ std::vector<Point> Map::get_neighbours(Point position)
         R = position.x < (this->width - 1);
 
     if (U) {
-        neighbours.push_back(Point(position.x, position.y-1));
+        neighbours.insert(Point(position.x, position.y-1));
     }
 
     if (D) {
-        neighbours.push_back(Point(position.x, position.y+1));
+        neighbours.insert(Point(position.x, position.y+1));
     }
 
     if (L) {
-        neighbours.push_back(Point(position.x-1, position.y));
+        neighbours.insert(Point(position.x-1, position.y));
     }
 
     if (R) {
-        neighbours.push_back(Point(position.x+1, position.y));
+        neighbours.insert(Point(position.x+1, position.y));
     }
 
     if (U && L) {
-        neighbours.push_back(Point(position.x-1, position.y-1));
+        neighbours.insert(Point(position.x-1, position.y-1));
     }
 
     if (U && R) {
-        neighbours.push_back(Point(position.x+1, position.y-1));
+        neighbours.insert(Point(position.x+1, position.y-1));
     }
 
     if (D && L) {
-        neighbours.push_back(Point(position.x-1, position.y+1));
+        neighbours.insert(Point(position.x-1, position.y+1));
     }
 
     if (D && R) {
-        neighbours.push_back(Point(position.x+1, position.y+1));
+        neighbours.insert(Point(position.x+1, position.y+1));
     }
 
     return neighbours;

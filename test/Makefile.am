@@ -8,6 +8,7 @@ check_PROGRAMS = \
     check-map-print \
     check-mine-flip \
     check-convenience-flipper \
-    check-easy-solve
+    check-easy-solve \
+    check-hard-solve
 
 TESTS = $(check_PROGRAMS)

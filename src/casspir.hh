@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <set>
 #include <queue>
 #include <cstdint>
 
@@ -17,7 +17,7 @@ Casspir::Map casspir_generate_map(
 Casspir::Map casspir_make_map(
     uint32_t w,
     uint32_t h,
-    std::vector<Casspir::Point> mines
+    std::set<Casspir::Point> mines
 );
 
 std::queue<Casspir::Operation> casspir_solve(Casspir::Map& map);

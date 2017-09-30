@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <set>
 
 #include "definitions.hh"
 
@@ -11,7 +12,7 @@ namespace Casspir
     {
         public:
             Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip);
-            Map(uint32_t width, uint32_t height, std::vector<Casspir::Point> mines);
+            Map(uint32_t width, uint32_t height, std::set<Casspir::Point> mines);
 
             uint64_t flip(Point position);
             void flag(Point position);
@@ -28,7 +29,9 @@ namespace Casspir
             TileState& get_tile(Point position);
             TileState& get_tile(uint64_t index);
 
-            std::vector<Point> get_neighbours(Point position);
+            bool is_tile_satisfied(Point position);
+
+            std::set<Point> get_neighbours(Point position);
 
             void print();
 

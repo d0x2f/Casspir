@@ -64,3 +64,4 @@ test/check-first-flip
 test/check-map-print
 test/check-convenience-flipper
 test/check-easy-solve
+test/check-hard-solve

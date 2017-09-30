@@ -2,13 +2,13 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
-#include <vector>
+#include <set>
 
 #include <casspir.hh>
 
 static void test_map_print()
 {
-    std::vector<Casspir::Point> mines = {
+    std::set<Casspir::Point> mines = {
         Casspir::Point(1,3),
         Casspir::Point(3,2),
         Casspir::Point(1,1),

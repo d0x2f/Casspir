@@ -17,7 +17,17 @@ static void test_easy_solve()
         Casspir::Point(6,4),
         Casspir::Point(8,3),
         Casspir::Point(2,8),
-        Casspir::Point(0,1)
+        Casspir::Point(0,1),
+        Casspir::Point(4,5),
+        Casspir::Point(5,2),
+        Casspir::Point(6,6),
+        Casspir::Point(2,9),
+        Casspir::Point(7,6),
+        Casspir::Point(9,1),
+        Casspir::Point(1,2),
+        Casspir::Point(5,3),
+        Casspir::Point(0,7),
+        Casspir::Point(1,9)
     };
     Casspir::Map map = casspir_make_map(10,10, mines);
 
@@ -31,8 +41,8 @@ static void test_easy_solve()
     //Map should be completed
     assert( map.get_status() == Casspir::MapStatus::COMPLETE );
 
-    //90 tiles should be flipped
-    assert( map.get_num_flipped() == 90 );
+    //80 tiles should be flipped
+    assert( map.get_num_flipped() == 80 );
 
     //0 mines should remain
     assert( map.get_mines_remaining() == 0 );
@@ -45,8 +55,8 @@ static void test_easy_solve()
     //0 tiles should be flipped
     assert( map.get_num_flipped() == 0 );
 
-    //10 mines should remain
-    assert( map.get_mines_remaining() == 10 );
+    //20 mines should remain
+    assert( map.get_mines_remaining() == 20 );
 }
 
 int main (void)

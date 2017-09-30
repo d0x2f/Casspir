@@ -6,7 +6,7 @@
 
 static void test_mine_flip()
 {
-    std::vector<Casspir::Point> mines = {
+    std::set<Casspir::Point> mines = {
         Casspir::Point(3,1),
         Casspir::Point(6,0),
         Casspir::Point(8,3),

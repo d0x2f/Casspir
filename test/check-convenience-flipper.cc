@@ -1,12 +1,12 @@
 #include <cassert>
 #include <cstdlib>
-#include <vector>
+#include <set>
 
 #include <casspir.hh>
 
 static void test_mine_flip()
 {
-    std::vector<Casspir::Point> mines = {
+    std::set<Casspir::Point> mines = {
         Casspir::Point(3,1),
         Casspir::Point(3,8),
         Casspir::Point(5,6),
