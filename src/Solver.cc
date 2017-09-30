@@ -10,6 +10,12 @@ using namespace Casspir;
 Solver::Solver(Map& map) : map(map)
 {
     this->map_size = this->map.get_width() * this->map.get_height();
+
+    this->random_engine.seed(41418740515);
+    this->random_int = std::uniform_int_distribution<uint64_t>(
+        0,
+        this->map_size - this->map.get_num_flipped()
+    );
 }
 
 std::queue<Operation> Solver::solve()
@@ -32,12 +38,7 @@ std::queue<Operation> Solver::solve()
 
 void Solver::flip_random_tile()
 {
-    std::default_random_engine generator;
-    std::uniform_int_distribution<uint64_t> distribution(
-        0,
-        this->map_size - this->map.get_num_flipped()
-    );
-    uint64_t random_index = distribution(generator);
+    uint64_t random_index = this->random_int(this->random_engine);
 
     uint64_t index = 0;
     for (uint64_t i=0; i < this->map_size; i++) {
@@ -137,13 +138,16 @@ std::pair< std::set<Point>, std::set<Point> > Solver::find_group()
 
         tile_position = Point::from_index(i, this->map.get_width());
 
+        border_unflipped.clear();
+        border_flipped.clear();
         this->recursive_border_search(tile_position, border_unflipped, border_flipped);
 
-        if (border_unflipped.size() > 0) {
+        if (border_unflipped.size() > 0 && border_unflipped.size() < 20) {
             return std::make_pair(border_unflipped, border_flipped);
+        } else if (border_unflipped.size() >= 20) {
         }
     }
-    return std::make_pair(border_unflipped, border_flipped);
+    return std::make_pair(std::set<Point>(), std::set<Point>());
 }
 
 bool Solver::enumerate_group(
@@ -157,7 +161,6 @@ bool Solver::enumerate_group(
     std::map<Point, uint64_t> tallies;
     uint64_t total_valid_permutations = 0;
 
-
     for (Point position : border_unflipped) {
         tallies.insert(std::pair<Point, uint64_t>(position, 0));
     }
@@ -167,7 +170,7 @@ bool Solver::enumerate_group(
         uint64_t j = 0;
         for (Point position : border_unflipped) {
             if (i & (1 << j)) {
-                //set flag j
+                //set flag
                 staging_map.get_tile(position).flagged = true;
 
                 //Skip if too many mines are used
@@ -176,7 +179,7 @@ bool Solver::enumerate_group(
                     goto double_break;
                 }
             } else {
-                //unset flag j
+                //unset flag
                 staging_map.get_tile(position).flagged = false;
             }
             j++;

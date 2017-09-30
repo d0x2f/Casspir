@@ -5,7 +5,7 @@
 #include <casspir.hh>
 #include <Solver.hh>
 
-static void test_easy_solve()
+static void test_hard_solve()
 {
     std::set<Casspir::Point> mines = {
         Casspir::Point(0,0),
@@ -66,7 +66,7 @@ static void test_easy_solve()
 
 int main (void)
 {
-    test_easy_solve();
+    test_hard_solve();
 
     return EXIT_SUCCESS;
 }

@@ -3,6 +3,8 @@
 #include <queue>
 #include <memory>
 #include <set>
+#include <random>
+#include <chrono>
 
 #include "Map.hh"
 #include "definitions.hh"
@@ -19,6 +21,8 @@ namespace Casspir
             Map& map;
             uint64_t map_size;
             std::queue<Operation> operations;
+            std::default_random_engine random_engine;
+            std::uniform_int_distribution<uint64_t> random_int;
 
             bool perform_pass();
             bool evaluate_neighbours(uint64_t index);

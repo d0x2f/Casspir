@@ -21,6 +21,10 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
     std::default_random_engine r_engine(r_device());
     std::uniform_real_distribution<> r_distribution(0, 1);
 
+    //Get first_flip neighbourhood so as not to place mines in there.
+    std::set<Point> first_flip_neighbourhood = this->get_neighbours(first_flip);
+    first_flip_neighbourhood.insert(first_flip);
+
     //Place mines randomly
     this->total_mines = 0;
     float mine_probability = ((float)(difficulty+20)) / 512.f;
@@ -29,7 +33,7 @@ Map::Map(uint32_t width, uint32_t height, uint8_t difficulty, Point first_flip)
 
         //Place if random value breaks difficulty threshold
         //But not if this is the first flipped tile
-        if (r_distribution(r_engine) < mine_probability && position != first_flip) {
+        if (r_distribution(r_engine) < mine_probability && first_flip_neighbourhood.count(position) == 0) {
             this->state[i].mine = true;
             this->total_mines += 1;
 
