@@ -217,10 +217,6 @@ bool Solver::enumerate_group(
         did_something |= this->flip(min_point);
     }
 
-    std::cout << "Tallies (/" << total_valid_permutations << "):" << std::endl;
-    for (auto& kv : tallies) {
-        std::cout << "(" << kv.first.x << ", " << kv.first.y << ") => " << kv.second << std::endl;
-    }
     return did_something;
 }
 
