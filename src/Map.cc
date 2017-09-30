@@ -107,7 +107,7 @@ uint64_t Map::flip(Point position)
         }
     } else if (!tile.flagged) {
         //Not yet flipped or flagged, let the flippening begin.
-        flipped += this->flip_recurse(position);
+        flipped = this->flip_recurse(position);
     }
 
     this->check_completed();
@@ -143,6 +143,10 @@ void Map::flag(Point position)
  */
 void Map::check_completed()
 {
+    if (this->status != MapStatus::IN_PROGRESS) {
+        return;
+    }
+
     if (this->get_mines_remaining() == 0
     && (this->get_num_flipped() + this->get_total_mines()) == this->state.size()
     ) {

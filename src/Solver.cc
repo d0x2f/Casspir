@@ -201,7 +201,7 @@ bool Solver::enumerate_group(
     //Flip those that never had a flag when satisfied.
     bool did_something = false;
     Point min_point;
-    uint64_t min_value = total_valid_permutations;
+    uint64_t min_value = total_valid_permutations+1;
     for (auto& kv : tallies) {
         if (kv.second == 0) {
             did_something |= this->flip(kv.first);
@@ -215,6 +215,11 @@ bool Solver::enumerate_group(
 
     if (!did_something) {
         did_something |= this->flip(min_point);
+    }
+
+    std::cout << "Tallies (/" << total_valid_permutations << "):" << std::endl;
+    for (auto& kv : tallies) {
+        std::cout << "(" << kv.first.x << ", " << kv.first.y << ") => " << kv.second << std::endl;
     }
     return did_something;
 }
