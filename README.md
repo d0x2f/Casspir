@@ -5,8 +5,5 @@
 
 Minsweeper puzzle generator and solver.
 
-## TODO
-* Implement a solver that produces an ordered list of tiles to flip.
-
 ## Resources
 * https://luckytoilet.wordpress.com/2012/12/23/2125/
