@@ -144,6 +144,8 @@ void Map::flag(Point position)
             }
         }
     }
+
+    this->check_completed();
 }
 
 /**

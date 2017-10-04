@@ -14,7 +14,7 @@ Solver::Solver(Map& map) : map(map)
     this->random_engine.seed(41418740515);
     this->random_int = std::uniform_int_distribution<uint64_t>(
         0,
-        this->map_size - this->map.get_num_flipped()
+        this->map_size
     );
 }
 
@@ -23,10 +23,9 @@ std::queue<Operation> Solver::solve()
     bool did_something = false;
     do {
         //Try basic
-        if (!this->perform_pass()) {
+        if (!this->perform_basic_pass()) {
             //Try permutation
-            std::pair< std::set<Point>, std::set<Point> > group = this->find_group();
-            if (!this->enumerate_group(group.first, group.second)) {
+            if (!this->enumerate_groups()) {
                 //Do random
                 this->flip_random_tile();
             }
@@ -38,7 +37,7 @@ std::queue<Operation> Solver::solve()
 
 void Solver::flip_random_tile()
 {
-    uint64_t random_index = this->random_int(this->random_engine);
+    uint64_t random_index = this->random_int(this->random_engine) % (this->map_size - this->map.get_num_flipped());
 
     uint64_t index = 0;
     for (uint64_t i=0; i < this->map_size; i++) {
@@ -58,7 +57,7 @@ void Solver::flip_random_tile()
  *
  * @return true if an action was performed.
  */
-bool Solver::perform_pass()
+bool Solver::perform_basic_pass()
 {
     bool did_something = false;
 
@@ -117,19 +116,24 @@ bool Solver::evaluate_neighbours(uint64_t index)
 }
 
 /**
- * Find a group of related border tiles.
+ * Find all groups of tiles.
  *
- * @return The points in the first group found.
+ * @return Whether a move was taken.
  */
-std::pair< std::set<Point>, std::set<Point> > Solver::find_group()
+bool Solver::enumerate_groups()
 {
-    std::set<Point> border_unflipped;
-    std::set<Point> border_flipped;
     TileState tile;
     Point tile_position;
     std::set<Point> neighbours;
+    std::set<Point> considered;
+    std::set< std::pair< Point, float> > candidates;
 
-    if (this->map.get_num_flipped() < 20) {
+    //If the number of remaining tiles is less than 20,
+    //just evaluate all of them.
+    if (this->map_size - this->map.get_num_flipped() < 20) {
+        std::set<Point> border_unflipped;
+        std::set<Point> border_flipped;
+
         for (uint64_t i=0; i < this->map_size; i++) {
             tile = this->map.get_tile(i);
             tile_position = Point::from_index(i, this->map.get_width());
@@ -145,29 +149,60 @@ std::pair< std::set<Point>, std::set<Point> > Solver::find_group()
                 }
             }
         }
+
+        candidates = this->evaluate_group(border_unflipped, border_flipped);
+    } else {
+        //Loop over each tile and consider it's group.
+        for (uint64_t i=0; i < this->map_size; i++) {
+            tile = this->map.get_tile(i);
+            if (tile.flipped) {
+                continue;
+            }
+
+            tile_position = Point::from_index(i, this->map.get_width());
+
+            if (considered.count(tile_position) > 0) {
+                continue;
+            }
+
+            std::set<Point> border_unflipped;
+            std::set<Point> border_flipped;
+
+            this->recursive_border_search(tile_position, border_unflipped, border_flipped);
+            considered.insert(border_unflipped.begin(), border_unflipped.end());
+
+            if (border_unflipped.size() > 0 && border_unflipped.size() < 20) {
+                std::set< std::pair< Point, float > > nominations = this->evaluate_group(
+                    border_unflipped,
+                    border_flipped
+                );
+                candidates.insert(nominations.begin(), nominations.end());
+            }
+        }
     }
 
-    //Find a border tile
-    for (uint64_t i=0; i < this->map_size; i++) {
-        tile = this->map.get_tile(i);
-        if (tile.flipped) {
+    float min_risk = 1.;
+    Point min_risk_point;
+    bool min_risk_point_found = false;
+    bool zero_risk_flip = false;
+    for (const auto& candidate : candidates) {
+        if (candidate.second == 0) {
+            this->flip(candidate.first);
+            zero_risk_flip = true;
             continue;
         }
 
-        tile_position = Point::from_index(i, this->map.get_width());
-
-        border_unflipped.clear();
-        border_flipped.clear();
-        this->recursive_border_search(tile_position, border_unflipped, border_flipped);
-
-        if (border_unflipped.size() > 0 && border_unflipped.size() < 20) {
-            return std::make_pair(border_unflipped, border_flipped);
+        if (!min_risk_point_found || candidate.second < min_risk) {
+            min_risk = candidate.second;
+            min_risk_point = candidate.first;
+            min_risk_point_found = true;
         }
     }
-    return std::make_pair(std::set<Point>(), std::set<Point>());
+
+    return zero_risk_flip || (min_risk_point_found && this->flip(min_risk_point));
 }
 
-bool Solver::enumerate_group(
+std::set< std::pair< Point, float > > Solver::evaluate_group(
     const std::set<Point> border_unflipped,
     const std::set<Point> border_flipped
 ) {
@@ -223,25 +258,23 @@ bool Solver::enumerate_group(
 
     //Flag those that always had a flag when satisfied.
     //Flip those that never had a flag when satisfied.
-    bool did_something = false;
     Point min_point;
     uint64_t min_value = total_valid_permutations+1;
+    std::set< std::pair< Point, float > > nominations;
     for (auto& kv : tallies) {
         if (kv.second == 0) {
-            did_something |= this->flip(kv.first);
+            nominations.insert(std::pair<Point, float>(kv.first, static_cast<float>(kv.second)/total_valid_permutations));
         } else if (kv.second == total_valid_permutations) {
-            did_something |= this->flag(kv.first);
+            this->flag(kv.first);
         } else if (kv.second < min_value) {
             min_value = kv.second;
             min_point = kv.first;
         }
     }
 
-    if (!did_something) {
-        did_something = this->flip(min_point);
-    }
+    nominations.insert(std::pair<Point, float>(min_point, static_cast<float>(min_value)/total_valid_permutations));
 
-    return did_something;
+    return nominations;
 }
 
 /**
@@ -275,6 +308,14 @@ bool Solver::flag(Point position)
     return true;
 }
 
+/**
+ * Recursively search through the game space looking for a contiguous set of unflipped border tiles.
+ * Border tiles being those that have a flipped tile as a neighbour.
+ *
+ * @param position The starting position
+ * @param border_unflipped A set to fill with unflipped tiles that make up the group.
+ * @param border_flipped A set to fill with flipped neighbours of the unflipped tiles.
+ */
 void Solver::recursive_border_search(
     Point position,
     std::set<Point>& border_unflipped,

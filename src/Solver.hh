@@ -24,14 +24,17 @@ namespace Casspir
             std::default_random_engine random_engine;
             std::uniform_int_distribution<uint64_t> random_int;
 
-            bool perform_pass();
+            bool perform_basic_pass();
             bool evaluate_neighbours(uint64_t index);
-            std::pair< std::set<Point>, std::set<Point> > find_group();
-            bool enumerate_group(
+
+            bool enumerate_groups();
+            std::set< std::pair< Point, float > > evaluate_group(
                 const std::set<Point> border_unflipped,
                 const std::set<Point> border_flipped
             );
+
             void flip_random_tile();
+
             bool flip(Point position);
             bool flag(Point position);
 
