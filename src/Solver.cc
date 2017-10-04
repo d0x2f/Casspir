@@ -129,6 +129,24 @@ std::pair< std::set<Point>, std::set<Point> > Solver::find_group()
     Point tile_position;
     std::set<Point> neighbours;
 
+    if (this->map.get_num_flipped() < 20) {
+        for (uint64_t i=0; i < this->map_size; i++) {
+            tile = this->map.get_tile(i);
+            tile_position = Point::from_index(i, this->map.get_width());
+            if (!tile.flipped) {
+                border_unflipped.insert(tile_position);
+                neighbours = this->map.get_neighbours(tile_position);
+
+                for (Point neighbour : neighbours) {
+                    TileState neighbour_tile = this->map.get_tile(neighbour);
+                    if (neighbour_tile.flipped) {
+                        border_flipped.insert(neighbour);
+                    }
+                }
+            }
+        }
+    }
+
     //Find a border tile
     for (uint64_t i=0; i < this->map_size; i++) {
         tile = this->map.get_tile(i);
@@ -144,7 +162,6 @@ std::pair< std::set<Point>, std::set<Point> > Solver::find_group()
 
         if (border_unflipped.size() > 0 && border_unflipped.size() < 20) {
             return std::make_pair(border_unflipped, border_flipped);
-        } else if (border_unflipped.size() >= 20) {
         }
     }
     return std::make_pair(std::set<Point>(), std::set<Point>());
@@ -221,7 +238,7 @@ bool Solver::enumerate_group(
     }
 
     if (!did_something) {
-        did_something |= this->flip(min_point);
+        did_something = this->flip(min_point);
     }
 
     return did_something;
