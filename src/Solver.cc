@@ -1,6 +1,7 @@
 #include <iostream>
 #include <map>
 #include <random>
+#include <cassert>
 
 #include "Solver.hh"
 #include "definitions.hh"
@@ -26,30 +27,13 @@ std::queue<Operation> Solver::solve()
         if (!this->perform_basic_pass()) {
             //Try permutation
             if (!this->enumerate_groups()) {
-                //Do random
-                this->flip_random_tile();
+                // Should never happen
+                assert (false);
             }
         }
     } while (this->map.get_status() == MapStatus::IN_PROGRESS);
 
     return this->operations;
-}
-
-void Solver::flip_random_tile()
-{
-    uint64_t random_index = this->random_int(this->random_engine) % (this->map_size - this->map.get_num_flipped());
-
-    uint64_t index = 0;
-    for (uint64_t i=0; i < this->map_size; i++) {
-        TileState tile = this->map.get_tile(i);
-        if (!tile.flipped) {
-            if (index == random_index) {
-                this->flip(Point::from_index(i, this->map.get_width()));
-                return;
-            }
-            index++;
-        }
-    }
 }
 
 /**
@@ -99,7 +83,7 @@ bool Solver::evaluate_neighbours(uint64_t index)
         unflipped += (!neighbour_tile.flipped);
     }
 
-    if (flagged == tile.value && unflipped > 0) {
+    if (flagged == tile.value && unflipped - flagged > 0) {
         //If this tile's values is satisfied by flagged neighbours, flip the rest
         did_something |= this->flip(tile_position);
     } else if (unflipped == tile.value) {
